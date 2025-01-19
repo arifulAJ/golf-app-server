@@ -1,7 +1,7 @@
 // sign up controller of the golf app server 
 
 const Response = require("../../../../helpers/respones");
-const { signUpService, verifyOtpService, resendOtpServices } = require("./auth.services");
+const { signUpService, verifyOtpService, resendOtpServices, signInServices } = require("./auth.services");
 
 
 
@@ -66,7 +66,7 @@ const resendOtp=async(req,res,next)=>{
 
         const result=await resendOtpServices({email})
 
-console.log(result);
+
       // Handle the service response
       if (!result.success) {
         return res.status(result.statusCode).json(Response(result));
@@ -80,9 +80,34 @@ console.log(result);
     }
 }
 
+// signin controller of the golf app server 
+//-----------------************************
+
+const signIn=async(req,res,next)=>{
+    try {
+
+        const {email,password}=req.body 
+
+        const result=await signInServices({email,password})
+
+           // Handle the service response
+      if (!result.success) {
+        return res.status(result.statusCode).json(Response(result));
+    }
+
+    // Respond with success message
+    return res.status(result.statusCode).json(Response(result));
+
+        
+    } catch (error) {
+        next(error)
+    }
+}
+
 
 module.exports={
     signUp,
     verifyOtp,
-    resendOtp
+    resendOtp,
+    signIn
 }
