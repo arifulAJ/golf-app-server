@@ -1,7 +1,7 @@
 // sign up controller of the golf app server 
 
 const Response = require("../../../../helpers/respones");
-const { signUpService, verifyOtpService } = require("./auth.services");
+const { signUpService, verifyOtpService, resendOtpServices } = require("./auth.services");
 
 
 
@@ -28,23 +28,6 @@ const signUp = async (req, res, next) => {
 // verify otp up controller of the golf app server 
 //-----------------************************
 
-// const verifyOtp=async(req,res,next)=>{
-//     try {
-//         const { code, email } = req.body;
-//          // Check if email or code is missing
-//          if (!email || !code) {
-//             return res.status(400).json(Response({ message: "Email and code are required", status: "Bad Request", statusCode: 400, type: "Validation" }));
-//         }
-
-//         const result=verifyOtpService({code,email})
-
-//        // Respond with success message
-//        res.status(200).json(Response({ message: "User verified successfully", status: "OK", statusCode: 200, data:result}));
-
-//     } catch (error) {
-//         next(error)
-//     }
-// }
 const verifyOtp = async (req, res, next) => {
     try {
         const { code, email } = req.body;
@@ -74,9 +57,32 @@ const verifyOtp = async (req, res, next) => {
     }
 };
 
+// resend  otp up controller of the golf app server 
+//-----------------************************
+
+const resendOtp=async(req,res,next)=>{
+    try {
+        const {email}=req.body
+
+        const result=await resendOtpServices({email})
+
+console.log(result);
+      // Handle the service response
+      if (!result.success) {
+        return res.status(result.statusCode).json(Response(result));
+    }
+
+    // Respond with success message
+    return res.status(result.statusCode).json(Response(result));
+
+    } catch (error) {
+        next(error)
+    }
+}
 
 
 module.exports={
     signUp,
-    verifyOtp
+    verifyOtp,
+    resendOtp
 }

@@ -1,62 +1,8 @@
-
-
-
-
-
-// sign up controller of the golf app server 
-//-----------------************************
-// const signUpService = async ({ name, email, password, phone, role ,city,state,country,handicap}) => {
-//     // Check if the user already exists
-//     const userExist = await User.findOne({ email: email });
-//     if (userExist) {
-//         return {
-//             success: false,
-//             statusCode: 409,
-//             message: 'User Already Exist',
-//             type: 'Auth',
-//         };
-//     }
-
 const sendActivationEmail = require("../../../../helpers/email");
 const User = require("../user/user.models");
 
-//     // Send activation email
-//     const emailResult = await sendActivationEmail(email, name);
-
-//     if (!emailResult.success) {
-//         return {
-//             success: false,
-//             statusCode: 500,
-//             message: 'Error sending activation email',
-//             type: 'Email',
-//             error: emailResult.error,
-//         };
-//     }
-
-//     // Create a new user instance and save it to the database
-//     const oneTimeCode = emailResult.oneTimeCode;
-//     const newUser = new User({ name, email, password, phone, oneTimeCode, role,city,state,country,handicap });
-//     const savedUser = await newUser.save();
-
-//     // Schedule oneTimeCode cleanup
-//     setTimeout(async () => {
-//         try {
-//             savedUser.oneTimeCode = null;
-//             await savedUser.save();
-//             console.log('oneTimeCode reset to null after 3 minutes');
-//         } catch (error) {
-//             console.error('Error updating oneTimeCode:', error);
-//         }
-//     }, 180000); // 3 minutes in milliseconds
-
-//     return {
-//         success: true,
-//         statusCode: 200,
-//         message: emailResult,
-//         data: savedUser,
-//         type: role,
-//     };
-// };
+// sign  up services of the golf app server 
+//-----------------************************
 
 const signUpService = async ({ name, email, password, phone, role, city, state, country, handicap }) => {
     // Check if the user already exists
@@ -157,7 +103,54 @@ const verifyOtpService = async ({ email, code }) => {
     };
 };
 
+// resend  otp up services of the golf app server 
+//-----------------************************
+
+const resendOtpServices=async({email})=>{
+
+    const findUser=await User.findOne({email})
+    
+    if(!findUser){
+        return {
+            success: false,
+            statusCode: 404,
+            status:"error",
+
+            message: "User not found",
+            
+        };
+    }
+
+    if(findUser.oneTimeCode===null){
+
+        const sendOtp=await sendActivationEmail(email,findUser.name)
+
+        findUser.oneTimeCode= sendOtp.oneTimeCode
+
+        await findUser.save()
+       
+
+
+        return{
+            success:true,
+            statusCode:200,
+            status:"success",
+            message:"send otp to you email "
+        }
+    }
+
+    return{
+        success:true,
+        statusCode:400,
+        status:"error",
+        message:"you have oneTimeCode pleace check the email"
+    }
+
+
+}
+
 module.exports = {
     signUpService,
-    verifyOtpService
+    verifyOtpService,
+    resendOtpServices
 };

@@ -1,5 +1,5 @@
 const express = require('express');
-const { signUp, verifyOtp } = require('./auth.controllers');
+const { signUp, verifyOtp, resendOtp } = require('./auth.controllers');
 
 
 
@@ -11,6 +11,9 @@ router.post('/sign-up',signUp);
 
 // this is verify otp  routers
 router.post('/verify-otp',verifyOtp);
+
+// this is resend  otp  routers
+router.post('/resend-otp',resendOtp);
 
 
 
